@@ -3,34 +3,26 @@
 #include "XmlParser.h"
 #include "XmlNode.h"
 
-int main() {
-    std::cout << " Testing Message Api " << std::endl;
+int main(int argc, char** argv) {
 
-    try {
-        xmlp::XmlParser parser("/home/dev/xmlFile.xml");
-        
-        std::string str ;
-        parser.getXmlContentAsString(str);
-        std::cout << str << std::endl ;
-        
-//        xmlp::XmlNode node;
-//        std::string str = "value1 attr2='my string'" ;
-//        std::string attrVal ;
-//        
-////        node.getAttrValue(str, attrVal);
-////        std::cout << " remaining String: " << str << std::endl ;
-////        std::cout << " Attr Value: " << attrVal << std::endl ;
-//        
-//        str = "\"my string\"" ;
-//        node.getAttrValue(str, attrVal);
-//        std::cout << " remaining String: " << str << std::endl ;
-//        std::cout << " Attr Value: " << attrVal << std::endl ;
-        
-    } catch (const std::runtime_error& err) {
-        std::cout << " Caught Exception : " << err.what() << std::endl;
-        return EXIT_FAILURE ;
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <XmlFileAbsPath>" << std::endl;
+        return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS ;
+    try {
+
+        xmlp::XmlParser parser(argv[1]);
+
+        std::string str;
+        parser.getXmlContentAsString(str);
+        std::cout << str << std::endl;
+
+    } catch (const std::runtime_error& err) {
+        std::cout << " Caught Exception : " << err.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 
 }
