@@ -83,6 +83,7 @@ namespace xmlp {
             // Found - Might some attributes present
 
             nodeName_ = tagContent.substr(0, pos);
+            boost::algorithm::trim(nodeName_);
             std::string remainingTagContent = tagContent.substr(pos + 1);
 
             while ((pos = remainingTagContent.find('=')) != std::string::npos) {
@@ -101,10 +102,14 @@ namespace xmlp {
                 attributes_.insert(XmlAttribute::Ptr(new XmlAttribute(attrName, attrValue)));
 
             }
-
+            
+            if(!remainingTagContent.empty()){
+                throw std::runtime_error("XmlNode::parseTagContent() - Wrong Xml Content : " + tagContent);
+            }
 
         }
         nodeName_ = tagContent;
+        boost::algorithm::trim(nodeName_);
         size_t posNodeName = nodeName_.find(' ');
         if(posNodeName == std::string::npos){
             justNodeName_ = nodeName_ ;
@@ -116,6 +121,7 @@ namespace xmlp {
 
     void XmlNode::getAttrValue(std::string& str, std::string& attrVal) {
      
+        const std::string origStr = str ;
         size_t pos1 = str.find(' ');
         if (pos1 != std::string::npos) {
             // Got some value
@@ -137,12 +143,18 @@ namespace xmlp {
         if (attrVal.at(0) == '\'') {
             // Process for quotes
             size_t endPosOfQuoteInStr = str.find('\'');
+            if(endPosOfQuoteInStr == std::string::npos){
+                throw std::runtime_error(" XmlNode::getAttrValue() - Error in Xml content : " + origStr);
+            }
             size_t startPosOfQuoteInAttr = attrVal.find('\'');
             attrVal = attrVal.substr(startPosOfQuoteInAttr + 1) + str.substr(0, endPosOfQuoteInStr);
             str = str.substr(endPosOfQuoteInStr + 1);
         } else if (attrVal.at(0) == '\"') {
             // Process for quotes
             size_t endPosOfQuoteInStr = str.find('\"');
+            if(endPosOfQuoteInStr == std::string::npos){
+                throw std::runtime_error(" XmlNode::getAttrValue() - Error in Xml content : " + origStr);
+            }
             size_t startPosOfQuoteInAttr = attrVal.find('\"');
             attrVal = attrVal.substr(startPosOfQuoteInAttr + 1) + str.substr(0, endPosOfQuoteInStr);
             str = str.substr(endPosOfQuoteInStr + 1);

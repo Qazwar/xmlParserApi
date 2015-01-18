@@ -90,18 +90,20 @@ namespace xmlp {
                 if (nodeName[1] == '/') {
                     parseTag(nodeName, nodeLabelText);
                     if (nodes_.back() != nodeLabelText) {
-                        throw std::runtime_error("XmlParser::parse() - Error in XML. Tag not closed : " + nodeLabelText);
+                        throw std::runtime_error("XmlParser::parse() - Error in XML. Tag: [ " + nodeLabelText + " ] not closed properly.");
                     }
                     nodes_.pop_back();
                     curr = curr->getParaent() ;
                 } else if (nodeName[nodeName.length() - 2] == '/') {
                     parseTag(nodeName, nodeLabelText);
                     nodeName = nodeName.substr(1, nodeName.length() - 3);
+                    boost::algorithm::trim(nodeName);
                     addChild(nodeName, curr, true);
                     //counts[nodeLabelText]++;
                 } else {
                     parseTag(nodeName, nodeLabelText);
                     nodeName = nodeName.substr(1, nodeName.length() - 2);
+                    boost::algorithm::trim(nodeName);
                     addChild(nodeName, curr);
                     curr = curr->getChildNode(nodeName);
                     isContent = true;
