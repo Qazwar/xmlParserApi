@@ -10,7 +10,7 @@ int main() {
         xmlp::XmlParser parser("/home/dev/xmlFile.xml");
         
         std::string str ;
-        parser.getNode("root")->toString(str);
+        parser.getXmlContentAsString(str);
         std::cout << str << std::endl ;
         
 //        xmlp::XmlNode node;

@@ -41,10 +41,18 @@ namespace xmlp {
             }
             parse();
         }
+        
         XmlNode::Ptr getNode(const std::string& label);
         void addChild(const std::string& label, XmlNode::Ptr parent);
         void addChild(const std::string& label, XmlNode::Ptr parent, bool isSingle, const std::string& content = std::string());
         
+        XmlNode::Ptr getRootNode() const {
+            return *(root_->getChildrenBeginIt());
+        }
+        
+        void getXmlContentAsString(std::string& str) {
+            getRootNode()->toString(str);
+        }
     };
 }
 
