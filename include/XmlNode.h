@@ -35,6 +35,7 @@ namespace xmlp {
         std::vector<XmlNode::Ptr> children_;
         std::string content_;
         std::string nodeName_;
+        std::string justNodeName_ ;
         
         bool isSingle_;
 
@@ -42,6 +43,10 @@ namespace xmlp {
 
         XmlNode(const std::string& tagContent, XmlNode::Ptr parent, bool isSingle = false, const std::string& content = std::string());
         ~XmlNode() {
+            
+        }
+        
+        XmlNode(){
             
         }
         
@@ -72,11 +77,13 @@ namespace xmlp {
         XmlNode::Ptr operator[](int index);
         
         void toString(std::string&);
+        
+        void getAttrValue(std::string& str, std::string& attrVal);
 
     private:
 
         void parseTagContent(const std::string& tagContent);
-        void getAttrValue(std::string& str, std::string& attrVal);
+        //void getAttrValue(std::string& str, std::string& attrVal);
 
 
     };

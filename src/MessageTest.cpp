@@ -13,13 +13,18 @@ int main() {
         parser.getNode("root")->toString(str);
         std::cout << str << std::endl ;
         
-        // <root name=value><child cname=cvalue /><child cname2=cvalue2 /></root>
-//        messageapi::XmlNode::Ptr node(new messageapi::XmlNode("<root name1=value1 name2=value2>", messageapi::XmlNode::Ptr()));
-//        node->addChild("<child cname=cvalue />");
-//        node->addChild("<child cname2=cvalue2 />");
-//        std::string str ;
-//        node->toString(str);
-//        std::cout << str << std::endl ;
+//        xmlp::XmlNode node;
+//        std::string str = "value1 attr2='my string'" ;
+//        std::string attrVal ;
+//        
+////        node.getAttrValue(str, attrVal);
+////        std::cout << " remaining String: " << str << std::endl ;
+////        std::cout << " Attr Value: " << attrVal << std::endl ;
+//        
+//        str = "\"my string\"" ;
+//        node.getAttrValue(str, attrVal);
+//        std::cout << " remaining String: " << str << std::endl ;
+//        std::cout << " Attr Value: " << attrVal << std::endl ;
         
     } catch (const std::runtime_error& err) {
         std::cout << " Caught Exception : " << err.what() << std::endl;

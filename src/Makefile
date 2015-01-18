@@ -35,7 +35,7 @@ $(DYNAMIC_LIB): $(OBJS)
 $(BIN): $(OBJS) $(MAIN_OBJ)
 	$(CXX) -o $(BIN) $(OBJS) $(MAIN_OBJ) $(LIBS)
 
-all: $(STATIC_LIB) $(DYNAMIC_LIB) $(BIN)
+all: $(STATIC_LIB) $(DYNAMIC_LIB) $(BIN) run
 	
 run:
 	@echo "----------------------------"

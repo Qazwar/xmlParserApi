@@ -93,7 +93,9 @@ namespace xmlp {
                 boost::algorithm::trim(attrName);
                 remainingTagContent = remainingTagContent.substr(pos + 1);
                 boost::algorithm::trim(remainingTagContent);
+
                 getAttrValue(remainingTagContent, attrValue);
+
                 boost::algorithm::trim(attrValue);
 
                 attributes_.insert(XmlAttribute::Ptr(new XmlAttribute(attrName, attrValue)));
@@ -103,12 +105,21 @@ namespace xmlp {
 
         }
         nodeName_ = tagContent;
+        size_t posNodeName = nodeName_.find(' ');
+        if(posNodeName == std::string::npos){
+            justNodeName_ = nodeName_ ;
+        }else{
+            justNodeName_ = nodeName_.substr(0, posNodeName);
+        }
+
     }
 
     void XmlNode::getAttrValue(std::string& str, std::string& attrVal) {
-
-        std::cout << " to get Value, str: " << str << std::endl;
+     
         size_t pos1 = str.find(' ');
+        if (pos1 != std::string::npos) {
+            // Got some value
+        }
         size_t pos2 = str.find('=');
         size_t pos;
         pos = std::min(pos1, pos2);
@@ -119,18 +130,38 @@ namespace xmlp {
             pos = pos1;
         }
         attrVal = str.substr(0, pos);
-
         if (pos < str.size() - 1) {
             str = str.substr(pos);
         }
+
+        if (attrVal.at(0) == '\'') {
+            // Process for quotes
+            size_t endPosOfQuoteInStr = str.find('\'');
+            size_t startPosOfQuoteInAttr = attrVal.find('\'');
+            attrVal = attrVal.substr(startPosOfQuoteInAttr + 1) + str.substr(0, endPosOfQuoteInStr);
+            str = str.substr(endPosOfQuoteInStr + 1);
+        } else if (attrVal.at(0) == '\"') {
+            // Process for quotes
+            size_t endPosOfQuoteInStr = str.find('\"');
+            size_t startPosOfQuoteInAttr = attrVal.find('\"');
+            attrVal = attrVal.substr(startPosOfQuoteInAttr + 1) + str.substr(0, endPosOfQuoteInStr);
+            str = str.substr(endPosOfQuoteInStr + 1);
+        }
+
     }
 
     void XmlNode::toString(std::string& strRet) {
         std::stringstream str;
-        str << "<" << nodeName_;
+        str << "<" << justNodeName_ ;
 
         BOOST_FOREACH(XmlAttribute::Ptr attr, attributes_) {
-            str << " " << attr->getName() << "=" << attr->getValue();
+            str << " " << attr->getName() << "=" ;
+            
+            if(attr->getValue().find(' ') != std::string::npos) {
+                str << "'" << attr->getValue() << "'" ;
+            }else{
+                str << attr->getValue();
+            }
         }
 
         if (isSingle_) {
@@ -142,7 +173,7 @@ namespace xmlp {
 
             if (getContent().length()) {
                 str << getContent() << std::endl;
-                str << "</" << nodeName_ << ">" << std::endl;
+                str << "</" << justNodeName_ << ">" << std::endl;
             } else {
                 strRet += str.str();
                 str.str("");
@@ -150,7 +181,7 @@ namespace xmlp {
                 BOOST_FOREACH(XmlNode::Ptr child, children_) {
                     child->toString(strRet);
                 }
-                str << "</" << nodeName_ << ">" << std::endl;
+                str << "</" << justNodeName_ << ">" << std::endl;
             }
 
 
