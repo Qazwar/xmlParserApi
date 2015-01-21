@@ -47,8 +47,9 @@ namespace xmlp {
         return root_->getChildNode(label);
     }
 
-    void XmlParser::parse() {
-        
+    void XmlParser::fillFromStr(const std::string& str) {
+        std::stringstream stream(str);
+
         char ch;
         std::string nodeName;
         std::string nodeLabelText;
@@ -56,12 +57,13 @@ namespace xmlp {
         bool isMatch = false;
         bool isContent = false;
         std::string title;
+        root_ = XmlNode::Ptr(new XmlNode("main", XmlNode::Ptr())); 
         XmlNode::Ptr curr = root_;
 
-        while (fileStream_.eof() != std::ios::eofbit) {
-            fileStream_.get(ch);
-            if(!(fileStream_.gcount() > 0)){
-                break ;
+        while (stream.eof() != std::ios::eofbit) {
+            stream.get(ch);
+            if (!(stream.gcount() > 0)) {
+                break;
             }
             if (ch == '<') {
 
@@ -86,14 +88,14 @@ namespace xmlp {
             } else if (nodeName.length() > 2 && nodeName.substr(0, 4) == "<!--" && nodeName.substr(nodeName.length() - 3, 3) == "-->") {
                 nodeName.clear();
                 isMatch = false;
-            } else if ( nodeName.length() > 0 && nodeName[0] == '<' && nodeName[nodeName.length() - 1] == '>') {
+            } else if (nodeName.length() > 0 && nodeName[0] == '<' && nodeName[nodeName.length() - 1] == '>') {
                 if (nodeName[1] == '/') {
                     parseTag(nodeName, nodeLabelText);
                     if (nodes_.back() != nodeLabelText) {
-                        throw std::runtime_error("XmlParser::parse() - Error in XML. Tag: [ " + nodeLabelText + " ] not closed properly.");
+                        throw std::runtime_error("XmlParser::fillFromStr() - Error in XML. Tag: [ " + nodeLabelText + " ] not closed properly.");
                     }
                     nodes_.pop_back();
-                    curr = curr->getParaent() ;
+                    curr = curr->getParaent();
                 } else if (nodeName[nodeName.length() - 2] == '/') {
                     parseTag(nodeName, nodeLabelText);
                     nodeName = nodeName.substr(1, nodeName.length() - 3);
@@ -110,9 +112,79 @@ namespace xmlp {
                     nodes_.push_back(nodeLabelText);
                     //counts[labeltext]++;
                 }
-                
+
                 nodeName.clear();
-                isMatch = false ;
+                isMatch = false;
+            }
+        }// while
+    }
+
+    void XmlParser::parse() {
+
+        char ch;
+        std::string nodeName;
+        std::string nodeLabelText;
+        std::string content;
+        bool isMatch = false;
+        bool isContent = false;
+        std::string title;
+        XmlNode::Ptr curr = root_;
+
+        while (fileStream_.eof() != std::ios::eofbit) {
+            fileStream_.get(ch);
+            if (!(fileStream_.gcount() > 0)) {
+                break;
+            }
+            if (ch == '<') {
+
+                isMatch = true;
+                if (isContent && content.length()) {
+                    curr->setContent(content);
+                    content.clear();
+                }
+                isContent = false;
+
+            }
+            if (isMatch) {
+                nodeName += ch;
+            }
+            if (isContent && isgraph(ch)) {
+                content += ch;
+            }
+            if (nodeName.length() > 1 && nodeName.substr(0, 5) == "<?xml" && nodeName.substr(nodeName.length() - 2, 2) == "?>") {
+                string_ = nodeName;
+                nodeName.clear();
+                isMatch = false;
+            } else if (nodeName.length() > 2 && nodeName.substr(0, 4) == "<!--" && nodeName.substr(nodeName.length() - 3, 3) == "-->") {
+                nodeName.clear();
+                isMatch = false;
+            } else if (nodeName.length() > 0 && nodeName[0] == '<' && nodeName[nodeName.length() - 1] == '>') {
+                if (nodeName[1] == '/') {
+                    parseTag(nodeName, nodeLabelText);
+                    if (nodes_.back() != nodeLabelText) {
+                        throw std::runtime_error("XmlParser::parse() - Error in XML. Tag: [ " + nodeLabelText + " ] not closed properly.");
+                    }
+                    nodes_.pop_back();
+                    curr = curr->getParaent();
+                } else if (nodeName[nodeName.length() - 2] == '/') {
+                    parseTag(nodeName, nodeLabelText);
+                    nodeName = nodeName.substr(1, nodeName.length() - 3);
+                    boost::algorithm::trim(nodeName);
+                    addChild(nodeName, curr, true);
+                    //counts[nodeLabelText]++;
+                } else {
+                    parseTag(nodeName, nodeLabelText);
+                    nodeName = nodeName.substr(1, nodeName.length() - 2);
+                    boost::algorithm::trim(nodeName);
+                    addChild(nodeName, curr);
+                    curr = curr->getChildNode(nodeName);
+                    isContent = true;
+                    nodes_.push_back(nodeLabelText);
+                    //counts[labeltext]++;
+                }
+
+                nodeName.clear();
+                isMatch = false;
             }
         }// while
 

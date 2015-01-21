@@ -29,17 +29,24 @@ namespace xmlp {
         bool isgraph(char ch);
         void parseTag(const std::string&, std::string&);
         void addMsg(const std::string& msg);
+        void fillFromStr(const std::string& str );
 
     public:
+        
+        
 
-        XmlParser(const std::string& xmlFile) : xmlFileName_(xmlFile),
-        fileStream_(xmlFile.c_str(), std::ios::in),
+        XmlParser(const std::string& str) : xmlFileName_(str),
+        fileStream_(xmlFileName_.c_str(), std::ios::in),
         isComment_(false),
         root_(new XmlNode("main", XmlNode::Ptr())) {
             if (!fileStream_.good()) {
-                throw std::runtime_error("XmlParser::XmlParser() - Could not read the given Xml file: " + xmlFile);
+                xmlFileName_ = "" ;
+                //try out parsing the string - may be it's an xml string
+                fillFromStr(str);
+            }else{
+                parse();
             }
-            parse();
+            
         }
         
         XmlNode::Ptr getNode(const std::string& label);
@@ -53,6 +60,7 @@ namespace xmlp {
         void getXmlContentAsString(std::string& str) {
             getRootNode()->toString(str);
         }
+        
     };
 }
 

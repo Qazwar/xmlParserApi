@@ -104,9 +104,10 @@ namespace xmlp {
             }
             
             if(!remainingTagContent.empty()){
-                throw std::runtime_error("XmlNode::parseTagContent() - Wrong Xml Content : " + tagContent);
+                if(remainingTagContent.find('=') == std::string::npos){
+                    throw std::runtime_error("XmlNode::parseTagContent() - Wrong Xml Content : " + tagContent);
+                }
             }
-
         }
         nodeName_ = tagContent;
         boost::algorithm::trim(nodeName_);

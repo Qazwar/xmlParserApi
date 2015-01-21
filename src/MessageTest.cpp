@@ -12,11 +12,20 @@ int main(int argc, char** argv) {
 
     try {
 
-        xmlp::XmlParser parser(argv[1]);
-
+//        xmlp::XmlParser parser(argv[1]);
+//
         std::string str;
-        parser.getXmlContentAsString(str);
+//        parser.getXmlContentAsString(str);
+//        std::cout << str << std::endl;
+        
+        
+        xmlp::XmlParser parser1("<root><node1 attr=value ></node1><node2 attr2='value is'></node2></root>");
+
+        str.clear();
+        parser1.getXmlContentAsString(str);
         std::cout << str << std::endl;
+        
+        
 
     } catch (const std::runtime_error& err) {
         std::cout << " Caught Exception : " << err.what() << std::endl;
